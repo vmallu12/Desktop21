@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  ubuntu-desktop:
+    build: .
+    container_name: ubuntu-desktop
+    restart: unless-stopped
+
+    ports:
+      - "6080:6080"
+      - "5901:5901"
+
+    environment:
+      TZ: UTC
+      VNC_RESOLUTION: 1366x768
+
+    shm_size: "1gb"
+
+    security_opt:
+      - seccomp:unconfined
+
+    tmpfs:
+      - /tmp:size=512m
+      - /run:size=128m
+
+    volumes:
+      - ./home:/home/desktop
+
+    healthcheck:
+      test: ["CMD", "pgrep", "Xtigervnc"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+    stop_grace_period: 20s
